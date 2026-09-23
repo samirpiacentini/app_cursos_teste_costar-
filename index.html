@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deixa a Tech Te Levar - Escola de Tecnologia ZecaTech 80s</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Orbitron & VT323 for Cyberpunk, Inter for clean body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@500;700;900&family=VT323&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'willow-green': '#8ed081',
+                        'celadon': '#b4d2ba',
+                        'vanilla-custard': '#dce2aa',
+                        'copper': '#b57f50',
+                        'ebony': '#4b543b',
+                        'neon-pink': '#ff007f',
+                        'neon-cyan': '#00f3ff',
+                        'neon-yellow': '#ffe600'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                        pixel: ['VT323', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --willow-green: #8ed081ff;
+            --celadon: #b4d2baff;
+            --vanilla-custard: #dce2aaff;
+            --copper: #b57f50ff;
+            --ebony: #4b543bff;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(75, 84, 59, 0.35);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(142, 208, 129, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 12, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(180, 210, 186, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(142, 208, 129, 0.8);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(142, 208, 129, 0.3);
+        }
+
+        .glass-modal {
+            background: rgba(18, 24, 15, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid var(--willow-green);
+        }
+
+        /* Scanline Background Effect */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Cyberpunk Glitch Effect */
+        .glitch-text {
+            position: relative;
+            text-shadow: 0 0 8px rgba(142, 208, 129, 0.8);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111810;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--copper);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--willow-green);
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-[#0b0e0a] text-gray-100 font-sans min-h-screen relative overflow-x-hidden">
+
+    <!-- Scanline overlay -->
+    <div class="scanlines fixed inset-0 z-50"></div>
+
+    <!-- Three.js Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-willow-green/30 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-lg bg-copper/30 border border-willow-green flex items-center justify-center text-willow-green group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-compact-disc text-2xl animate-spin" style="animation-duration: 8s;"></i>
+                </div>
+                <div>
+                    <span class="font-cyber font-bold text-lg md:text-xl text-vanilla-custard tracking-wider block">ZECA<span class="text-willow-green">TECH</span></span>
+                    <span class="font-pixel text-xs text-celadon tracking-widest block -mt-1">SAMBA & CYBERDADOS</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-6 font-cyber text-sm tracking-wide">
+                <a href="#home" class="text-celadon hover:text-willow-green transition-colors">Início</a>
+                <a href="#cursos" class="text-celadon hover:text-willow-green transition-colors">Cursos</a>
+                <a href="#simulador" class="text-celadon hover:text-willow-green transition-colors">Monte Seu Trilha</a>
+                <a href="#faq" class="text-celadon hover:text-willow-green transition-colors">Dúvidas</a>
+            </nav>
+
+            <!-- Action Controls -->
+            <div class="flex items-center gap-3">
+                <!-- Audio Synth Toggle Button -->
+                <button id="audio-toggle" class="p-2 rounded-lg bg-ebony/60 border border-copper text-vanilla-custard hover:border-willow-green transition-colors" title="Ativar Som Retro Synth">
+                    <i class="fa-solid fa-volume-xmark" id="audio-icon"></i>
+                </button>
+                <a href="#cursos" class="hidden sm:inline-block px-4 py-2 rounded-md bg-copper hover:bg-copper/80 text-white font-cyber text-xs font-bold uppercase tracking-widest shadow-lg shadow-copper/30 transition-all transform hover:-translate-y-0.5">
+                    Ver Cursos
+                </a>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 text-willow-green focus:outline-none">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden pt-4 pb-2 border-t border-willow-green/20 mt-3 flex flex-col gap-3 font-cyber text-sm">
+            <a href="#home" class="mobile-link text-celadon hover:text-willow-green px-2 py-1">Início</a>
+            <a href="#cursos" class="mobile-link text-celadon hover:text-willow-green px-2 py-1">Cursos</a>
+            <a href="#simulador" class="mobile-link text-celadon hover:text-willow-green px-2 py-1">Monte Sua Trilha</a>
+            <a href="#faq" class="mobile-link text-celadon hover:text-willow-green px-2 py-1">Dúvidas Frequentes</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO BANNER SECTION -->
+        <section id="home" class="relative min-h-[85vh] flex items-center justify-center px-4 py-12 lg:py-20">
+            <div class="max-w-5xl mx-auto text-center z-10">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ebony/80 border border-willow-green/50 text-willow-green text-xs md:text-sm font-pixel tracking-widest mb-6">
+                    <span class="w-2 h-2 rounded-full bg-willow-green animate-ping"></span>
+                    MATRÍCULAS ABERTAS • ANOS 80 RETRO-FUTURO
+                </div>
+
+                <!-- Main Headline -->
+                <h1 class="font-cyber font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-willow-green via-vanilla-custard to-copper uppercase leading-tight glitch-text">
+                    Deixa a Tecnologia <br class="hidden sm:block"/>Me Levar!
+                </h1>
+
+                <!-- Subtitle with Friendly Tone -->
+                <p class="text-celadon text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-8 font-sans font-light leading-relaxed">
+                    Aprender programação e banco de dados é igual partido alto: com ritmo, alegria e no seu tempo! 
+                    Feito sob medida para <strong class="text-vanilla-custard">jovens curiosos, pais em transição e avós antenados</strong>.
+                </p>
+
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                    <button onclick="openEnrollModal('Curso Geral')" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-willow-green to-copper text-ebony font-cyber font-black text-sm uppercase tracking-wider shadow-lg shadow-willow-green/20 hover:scale-105 transition-transform flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rocket"></i> Quero Me Matricular
+                    </button>
+                    <a href="#simulador" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel text-vanilla-custard hover:text-willow-green font-cyber font-bold text-sm uppercase tracking-wider border border-willow-green/40 hover:border-willow-green transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> Simular Minha Trilha
+                    </a>
+                </div>
+
+                <!-- Stats Counter Panel -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-willow-green/20">
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <span class="block font-cyber text-2xl md:text-3xl font-bold text-willow-green">380h</span>
+                        <span class="text-xs text-celadon font-pixel tracking-wider">HORAS TOTAL DE AULAS</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <span class="block font-cyber text-2xl md:text-3xl font-bold text-vanilla-custard">9</span>
+                        <span class="text-xs text-celadon font-pixel tracking-wider">CURSOS PRÁTICOS</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <span class="block font-cyber text-2xl md:text-3xl font-bold text-copper">100%</span>
+                        <span class="text-xs text-celadon font-pixel tracking-wider">DIDÁTICA DESCOMPLICADA</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <span class="block font-cyber text-2xl md:text-3xl font-bold text-willow-green">0</span>
+                        <span class="text-xs text-celadon font-pixel tracking-wider">PRÉ-REQUISITOS MÍNIMOS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATALOG SECTION WITH FILTERS & CARDS -->
+        <section id="cursos" class="py-16 px-4 max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-cyber font-bold text-2xl sm:text-4xl text-vanilla-custard mb-3 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-code text-willow-green"></i> Catálogo de Cursos Tech
+                </h2>
+                <p class="text-celadon max-w-2xl mx-auto text-sm sm:text-base">
+                    Escolha o ritmo que combina com você. Conteúdo direto ao ponto, com suporte para tirar dúvidas e criar projetos reais.
+                </p>
+
+                <!-- Search & Filters -->
+                <div class="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-72">
+                        <input type="text" id="course-search" placeholder="Buscar curso ou tecnologia..." class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-ebony/60 border border-willow-green/40 text-vanilla-custard placeholder-celadon/50 focus:outline-none focus:border-willow-green text-sm font-sans">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-celadon/70 text-sm"></i>
+                    </div>
+
+                    <!-- Category Filter Buttons -->
+                    <div class="flex flex-wrap justify-center gap-2 w-full md:w-auto font-cyber text-xs">
+                        <button class="filter-btn active px-4 py-2 rounded-lg bg-willow-green text-ebony font-bold transition-all" data-category="todos">
+                            Todos (9)
+                        </button>
+                        <button class="filter-btn px-4 py-2 rounded-lg glass-card text-celadon hover:text-willow-green transition-all" data-category="python">
+                            Python
+                        </button>
+                        <button class="filter-btn px-4 py-2 rounded-lg glass-card text-celadon hover:text-willow-green transition-all" data-category="web">
+                            Dev Web
+                        </button>
+                        <button class="filter-btn px-4 py-2 rounded-lg glass-card text-celadon hover:text-willow-green transition-all" data-category="banco">
+                            Banco de Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Grid Container -->
+            <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Course cards injected dynamically via JavaScript -->
+            </div>
+        </section>
+
+        <!-- SIMULATOR / CALCULATOR SECTION -->
+        <section id="simulador" class="py-16 px-4 max-w-7xl mx-auto">
+            <div class="glass-panel rounded-2xl p-6 sm:p-10 border border-copper/40">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <!-- Left: Description & Course Selector -->
+                    <div class="lg:col-span-7">
+                        <div class="inline-block px-3 py-1 rounded bg-copper/20 border border-copper text-copper font-pixel text-xs tracking-widest mb-3">
+                            FERRAMENTA INTERATIVA
+                        </div>
+                        <h2 class="font-cyber font-bold text-2xl sm:text-3xl text-vanilla-custard mb-4">
+                            Simulador "Monte seu Pagode Tech" 🥁
+                        </h2>
+                        <p class="text-celadon text-sm mb-6">
+                            Selecione os módulos abaixo para montar seu combo personalizado. Calcule a carga horária e descubra o nível do seu certificado!
+                        </p>
+
+                        <!-- Course Checkboxes -->
+                        <div id="sim-options" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                            <!-- Checkbox items injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Summary Box -->
+                    <div class="lg:col-span-5 glass-card p-6 rounded-xl border border-willow-green/40 sticky top-24">
+                        <h3 class="font-cyber font-bold text-lg text-willow-green mb-4 pb-2 border-b border-willow-green/20 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie"></i> Resumo da Sua Trilha
+                        </h3>
+
+                        <div class="space-y-4 text-sm font-sans">
+                            <div class="flex justify-between items-center">
+                                <span class="text-celadon">Cursos Selecionados:</span>
+                                <span id="sim-count" class="font-cyber text-vanilla-custard font-bold text-base">0 cursos</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-celadon">Carga Horária Total:</span>
+                                <span id="sim-hours" class="font-cyber text-willow-green font-extrabold text-2xl">0h</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-celadon">Nível Alcançado:</span>
+                                <span id="sim-level" class="font-pixel text-copper text-lg font-bold">Iniciante Curioso</span>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="w-full bg-ebony rounded-full h-3 overflow-hidden border border-willow-green/30">
+                                <div id="sim-bar" class="bg-gradient-to-r from-willow-green to-copper h-full w-0 transition-all duration-500"></div>
+                            </div>
+
+                            <div class="pt-4">
+                                <button id="sim-enroll-btn" onclick="enrollSelectedCourses()" class="w-full py-3 rounded-lg bg-willow-green hover:bg-willow-green/90 text-ebony font-cyber font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50" disabled>
+                                    Matricular Trilha Selecionada
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ SECTION (ACCORDION FOR YOUTH, PARENTS, GRANDPARENTS) -->
+        <section id="faq" class="py-16 px-4 max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="font-pixel text-willow-green tracking-widest text-sm">SEM COMPLICAÇÃO</span>
+                <h2 class="font-cyber font-bold text-2xl sm:text-4xl text-vanilla-custard mt-1">Dúvidas Frequentes</h2>
+                <p class="text-celadon text-sm mt-2">Respostas diretas para netos, pais e avós sem 'embromation'.</p>
+            </div>
+
+            <div id="faq-container" class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="glass-card rounded-xl border border-willow-green/20 overflow-hidden">
+                    <button class="faq-toggle w-full p-5 text-left font-cyber text-vanilla-custard hover:text-willow-green flex justify-between items-center font-semibold text-sm sm:text-base">
+                        <span>👴 Preciso ter computador super moderno ou ser fera em matemática?</span>
+                        <i class="fa-solid fa-chevron-down text-willow-green transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-celadon text-sm font-sans leading-relaxed border-t border-willow-green/10">
+                        Não mesmo! Um computador simples ou notebook convencional já é suficiente para acompanhar as aulas. Nossos cursos usam ferramentas leves e gratuitas. Quanto à matemática: basta saber somar e ter vontade de aprender. A gente ensina o resto no passo a passo bem calmo!
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="glass-card rounded-xl border border-willow-green/20 overflow-hidden">
+                    <button class="faq-toggle w-full p-5 text-left font-cyber text-vanilla-custard hover:text-willow-green flex justify-between items-center font-semibold text-sm sm:text-base">
+                        <span>👩‍👦 Como os pais acompanham o progresso dos filhos mais jovens?</span>
+                        <i class="fa-solid fa-chevron-down text-willow-green transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-celadon text-sm font-sans leading-relaxed border-t border-willow-green/10">
+                        Nossa equipe emite relatórios mensais simples e práticos. Além disso, incentivamos que os alunos apresentem pequenos projetos (como sites ou pequenos programas) em casa para a família ver a evolução prática!
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="glass-card rounded-xl border border-willow-green/20 overflow-hidden">
+                    <button class="faq-toggle w-full p-5 text-left font-cyber text-vanilla-custard hover:text-willow-green flex justify-between items-center font-semibold text-sm sm:text-base">
+                        <span>🚀 O que é a Trilha de Python e Banco de Dados?</span>
+                        <i class="fa-solid fa-chevron-down text-willow-green transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-celadon text-sm font-sans leading-relaxed border-t border-willow-green/10">
+                        Python é a linguagem de programação mais popular do mundo, perfeita para quem está começando e usada por gigantes como Google e Netflix. O Banco de Dados é o 'caderno digital' onde guardamos as informações. Juntos, eles formam a base mais valorizada do mercado atual.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="glass-card rounded-xl border border-willow-green/20 overflow-hidden">
+                    <button class="faq-toggle w-full p-5 text-left font-cyber text-vanilla-custard hover:text-willow-green flex justify-between items-center font-semibold text-sm sm:text-base">
+                        <span>📜 Os cursos oferecem certificado de conclusão?</span>
+                        <i class="fa-solid fa-chevron-down text-willow-green transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-celadon text-sm font-sans leading-relaxed border-t border-willow-green/10">
+                        Com certeza! Ao completar qualquer curso (ou trilha combinada), você recebe um certificado digital validado, com carga horária descrita e QR Code de autenticidade para enriquecer seu currículo ou perfil no LinkedIn.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel border-t border-willow-green/30 mt-20 py-10 px-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+            <div>
+                <span class="font-cyber font-bold text-lg text-vanilla-custard block mb-2">ZECA<span class="text-willow-green">TECH</span></span>
+                <p class="text-celadon text-xs leading-relaxed mb-4">
+                    Escola de Tecnologia Retrofuturista. Unindo o calor da comunidade do samba e a potência da tecnologia do amanhã.
+                </p>
+                <div class="flex gap-4 text-willow-green text-lg">
+                    <a href="#" class="hover:text-vanilla-custard transition-colors"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="hover:text-vanilla-custard transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-vanilla-custard transition-colors"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="hover:text-vanilla-custard transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-cyber text-vanilla-custard font-bold mb-3">Links Rápidos</h4>
+                <ul class="space-y-2 text-celadon text-xs font-sans">
+                    <li><a href="#home" class="hover:text-willow-green transition-colors">Início</a></li>
+                    <li><a href="#cursos" class="hover:text-willow-green transition-colors">Catálogo Completo</a></li>
+                    <li><a href="#simulador" class="hover:text-willow-green transition-colors">Simulador de Trilha</a></li>
+                    <li><a href="#faq" class="hover:text-willow-green transition-colors">Perguntas Frequentes</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-cyber text-vanilla-custard font-bold mb-3">Hospedagem & Deploy</h4>
+                <p class="text-celadon text-xs leading-relaxed mb-3">
+                    Código pronto para versionamento no <strong>GitHub</strong> e publicação contínua no <strong>Netlify</strong>.
+                </p>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-ebony border border-willow-green/30 text-willow-green text-xs font-pixel">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> NETLIFY & GITHUB READY
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto border-t border-willow-green/10 mt-8 pt-6 text-center text-xs text-celadon/60 font-pixel">
+            © 2026 ZECA TECH SCHOOL. Deixa a tecnologia te levar, a vida leva eu!
+        </div>
+    </footer>
+
+    <!-- MODAL 1: DETALHES DO CURSO -->
+    <div id="course-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass-modal w-full max-w-2xl rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto relative text-gray-100">
+            <!-- Close Button -->
+            <button onclick="closeCourseModal()" class="absolute top-4 right-4 text-celadon hover:text-willow-green text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div id="modal-badge" class="inline-block px-3 py-1 rounded bg-copper/30 border border-copper text-copper font-pixel text-xs tracking-widest mb-2">
+                CATEGORIA
+            </div>
+            <h3 id="modal-title" class="font-cyber font-bold text-2xl sm:text-3xl text-vanilla-custard mb-2">
+                Nome do Curso
+            </h3>
+            <div class="flex flex-wrap gap-4 text-xs font-pixel text-willow-green mb-6 pb-4 border-b border-willow-green/20">
+                <span id="modal-hours"><i class="fa-regular fa-clock"></i> 40 Horas</span>
+                <span id="modal-level"><i class="fa-solid fa-signal"></i> Iniciante</span>
+                <span><i class="fa-solid fa-graduation-cap"></i> Certificado Incluso</span>
+            </div>
+
+            <!-- Modal Content Grid -->
+            <div class="space-y-6 text-sm font-sans">
+                <div>
+                    <h4 class="font-cyber font-bold text-vanilla-custard mb-1 text-xs uppercase tracking-wider">Descrição Resumida</h4>
+                    <p id="modal-desc" class="text-celadon leading-relaxed"></p>
+                </div>
+
+                <div>
+                    <h4 class="font-cyber font-bold text-vanilla-custard mb-1 text-xs uppercase tracking-wider">Ementa O que você vai aprender</h4>
+                    <ul id="modal-syllabus" class="list-disc list-inside text-celadon space-y-1"></ul>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div class="glass-card p-3 rounded-lg">
+                        <h5 class="font-cyber font-bold text-copper text-xs mb-1">PÚBLICO-ALVO</h5>
+                        <p id="modal-target" class="text-xs text-celadon"></p>
+                    </div>
+                    <div class="glass-card p-3 rounded-lg">
+                        <h5 class="font-cyber font-bold text-willow-green text-xs mb-1">PRÉ-REQUISITOS</h5>
+                        <p id="modal-reqs" class="text-xs text-celadon"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer CTA -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-3 pt-4 border-t border-willow-green/20">
+                <button id="modal-enroll-btn" class="w-full sm:w-1/2 py-3 rounded-xl bg-willow-green text-ebony font-cyber font-bold text-xs uppercase tracking-wider hover:bg-willow-green/90 transition-all">
+                    Matricular-se Agora
+                </button>
+                <button onclick="closeCourseModal()" class="w-full sm:w-1/2 py-3 rounded-xl glass-panel text-celadon font-cyber text-xs uppercase tracking-wider hover:text-vanilla-custard">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: FORMULÁRIO DE INSCRIÇÃO -->
+    <div id="enroll-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass-modal w-full max-w-lg rounded-2xl p-6 sm:p-8 relative">
+            <button onclick="closeEnrollModal()" class="absolute top-4 right-4 text-celadon hover:text-willow-green text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="font-cyber font-bold text-xl sm:text-2xl text-vanilla-custard mb-1">
+                Pré-Matrícula ZecaTech 🥁
+            </h3>
+            <p id="enroll-course-name" class="text-willow-green font-pixel text-sm mb-6">
+                Curso Selecionado: Geral
+            </p>
+
+            <form id="enroll-form" onsubmit="handleFormSubmit(event)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block font-cyber text-xs text-celadon mb-1">Nome Completo</label>
+                    <input type="text" id="user-name" required placeholder="Ex: Zeca do Cavaco" class="w-full px-4 py-2.5 rounded-lg bg-ebony/80 border border-willow-green/40 text-vanilla-custard focus:outline-none focus:border-willow-green">
+                </div>
+
+                <div>
+                    <label class="block font-cyber text-xs text-celadon mb-1">E-mail de Contato</label>
+                    <input type="email" id="user-email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-2.5 rounded-lg bg-ebony/80 border border-willow-green/40 text-vanilla-custard focus:outline-none focus:border-willow-green">
+                </div>
+
+                <div>
+                    <label class="block font-cyber text-xs text-celadon mb-1">WhatsApp / Telefone</label>
+                    <input type="tel" id="user-phone" required placeholder="(11) 99999-9999" class="w-full px-4 py-2.5 rounded-lg bg-ebony/80 border border-willow-green/40 text-vanilla-custard focus:outline-none focus:border-willow-green">
+                </div>
+
+                <div>
+                    <label class="block font-cyber text-xs text-celadon mb-1">Quem é você?</label>
+                    <select id="user-profile" class="w-full px-4 py-2.5 rounded-lg bg-ebony/80 border border-willow-green/40 text-vanilla-custard focus:outline-none focus:border-willow-green">
+                        <option value="Jovem">Jovem buscando 1º emprego tech</option>
+                        <option value="Pai/Mãe">Pai ou Mãe querendo aprender ou matricular filho</option>
+                        <option value="Avó/Avô">Avó ou Avô antenado na tecnologia</option>
+                        <option value="Entusiasta">Apenas querendo aprender algo novo</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 mt-2 rounded-xl bg-gradient-to-r from-willow-green to-copper text-ebony font-cyber font-black text-xs uppercase tracking-wider shadow-lg shadow-willow-green/20 hover:scale-[1.02] transition-transform">
+                    Confirmar Pré-Inscrição
+                </button>
+            </form>
+
+            <!-- Success Confirmation Message -->
+            <div id="enroll-success" class="hidden text-center py-8">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-willow-green/20 border border-willow-green flex items-center justify-center text-willow-green text-3xl">
+                    <i class="fa-solid fa-drum"></i>
+                </div>
+                <h4 class="font-cyber font-bold text-xl text-willow-green mb-2">Samba no Teclado! 🎉</h4>
+                <p class="text-celadon text-sm mb-6">
+                    Inscrição recebida com sucesso! Nossa equipe entrará em contato via WhatsApp nas próximas 24 horas.
+                </p>
+                <button onclick="closeEnrollModal()" class="px-6 py-2 rounded-lg bg-ebony border border-willow-green text-willow-green font-cyber text-xs">
+                    Entendido, Obrigado!
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT LOGIC & THREE.JS ENGINE -->
+    <script>
+        const COURSES_DATA = [
+            // Python Category
+            {
+                id: 'py1',
+                title: 'Programação em Python 1',
+                category: 'python',
+                hours: 40,
+                icon: 'fa-brands fa-python',
+                tag: 'Iniciante',
+                desc: 'A porta de entrada perfeita no mundo da programação. Aprenda variáveis, decisões e lógica sem mistério.',
+                syllabus: ['Conceitos fundamentais de algoritmos', 'Estruturas condicionais (if/else)', 'Laços de repetição (for/while)', 'Projetos práticos e interativos'],
+                target: 'Jovens e iniciantes de qualquer idade sem nenhuma experiência prévia.',
+                reqs: 'Apenas saber usar computador básico e vontade de aprender.'
+            },
+            {
+                id: 'py2',
+                title: 'Programação em Python 2',
+                category: 'python',
+                hours: 40,
+                icon: 'fa-brands fa-python',
+                tag: 'Intermediário',
+                desc: 'Aprofunde seus conhecimentos em estruturas de dados, funções personalizadas e manipulação de arquivos.',
+                syllabus: ['Listas, Tuplas e Dicionários', 'Criação de Funções e Módulos', 'Leitura e escrita de arquivos', 'Tratamento de erros simples'],
+                target: 'Alunos que já concluíram o Python 1 ou já conhecem lógica básica.',
+                reqs: 'Conhecimento dos conceitos do Python 1.'
+            },
+            {
+                id: 'py3',
+                title: 'Programação em Python 3',
+                category: 'python',
+                hours: 60,
+                icon: 'fa-brands fa-python',
+                tag: 'Avançado',
+                desc: 'Domine Orientação a Objetos, automações e consumo de APIs externas de forma profissional.',
+                syllabus: ['Orientação a Objetos (Classes e Métodos)', 'Consumo de APIs REST com Requests', 'Automação de tarefas do dia a dia', 'Projeto integrador completo'],
+                target: 'Futuros desenvolvedores buscando nível profissional em Python.',
+                reqs: 'Conhecimento dos módulos Python 1 e 2.'
+            },
+
+            // Web Dev Category
+            {
+                id: 'web1',
+                title: 'Dev Web com HTML, CSS e JS',
+                category: 'web',
+                hours: 60,
+                icon: 'fa-solid fa-code',
+                tag: 'Essencial',
+                desc: 'Construa sites bonitos, modernos e responsivos do zero para a internet.',
+                syllabus: ['Estruturação semântica com HTML5', 'Estilização e layouts flexíveis com CSS3', 'Interatividade com JavaScript puro', 'Publicação do site na nuvem'],
+                target: 'Quem quer criar sites para pequenos negócios, projetos próprios ou iniciar na carreira web.',
+                reqs: 'Nenhum. Começa do zero absoluto!'
+            },
+            {
+                id: 'web2',
+                title: 'Desenvolvimento Web com React',
+                category: 'web',
+                hours: 40,
+                icon: 'fa-brands fa-react',
+                tag: 'Moderno',
+                desc: 'Aprenda a biblioteca mais requisitada pelas empresas para criar sistemas web dinâmicos.',
+                syllabus: ['Componentização e JSX', 'Gerenciamento de Estado (useState, useEffect)', 'Consumo de APIs e interfaces interativas', 'Boas práticas e componentes reativos'],
+                target: 'Alunos que querem criar aplicações modernas estilo grandes startups.',
+                reqs: 'Conhecimento básico de HTML, CSS e JavaScript.'
+            },
+            {
+                id: 'web3',
+                title: 'Dev Web com Flask e Django',
+                category: 'web',
+                hours: 80,
+                icon: 'fa-solid fa-server',
+                tag: 'Fullstack',
+                desc: 'Aprenda a criar o "cérebro" de aplicações web robustas usando o poder do Python.',
+                syllabus: ['Rotas e views com Flask', 'Estrutura robusta do Django Framework', 'Autenticação de usuários e segurança', 'Criação de APIs e banco de dados web'],
+                target: 'Alunos que querem dominar backend e criar sistemas completos.',
+                reqs: 'Conhecimento básico de Python e HTML.'
+            },
+
+            // Database Category
+            {
+                id: 'db1',
+                title: 'Banco de Dados SQLite3',
+                category: 'banco',
+                hours: 20,
+                icon: 'fa-solid fa-database',
+                tag: 'Prático',
+                desc: 'Aprenda a guardar e consultar informações de forma leve e rápida diretamente em arquivos.',
+                syllabus: ['Comandos SQL fundamentais (SELECT, INSERT, UPDATE, DELETE)', 'Criação de tabelas e tipos de dados', 'Integração fácil com programas Python'],
+                target: 'Qualquer aluno interessado em entender como funcionam cadastros digitais.',
+                reqs: 'Lógica básica de computador.'
+            },
+            {
+                id: 'db2',
+                title: 'Realtime Database (Firebase)',
+                category: 'banco',
+                hours: 20,
+                icon: 'fa-solid fa-bolt',
+                tag: 'Nuvem',
+                desc: 'Armazene dados em tempo real na nuvem sem precisar configurar servidores complexos.',
+                syllabus: ['Conceito de bancos NoSQL em tempo real', 'Sincronização de dados instantânea', 'Regras de acesso e segurança na nuvem'],
+                target: 'Criadores de aplicativos móveis ou sites dinâmicos que precisam de agilidade.',
+                reqs: 'Conhecimento básico de JavaScript ou Python.'
+            },
+            {
+                id: 'db3',
+                title: 'Banco de Dados PostgreSQL',
+                category: 'banco',
+                hours: 40,
+                icon: 'fa-solid fa-server',
+                tag: 'Empresarial',
+                desc: 'Domine um dos bancos de dados relacionais mais potentes e confiáveis do mercado global.',
+                syllabus: ['Modelagem de dados e relacionamentos', 'Queries avançadas e JOINs', 'Indexação, performance e segurança'],
+                target: 'Quem deseja trabalhar em grandes empresas ou lidar com volume de dados.',
+                reqs: 'Noções de comandos SQL básicos.'
+            }
+        ];
+
+        function renderCourses(filteredCourses = COURSES_DATA) {
+            const grid = document.getElementById('courses-grid');
+            grid.innerHTML = '';
+
+            if (filteredCourses.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 glass-card rounded-xl">
+                        <i class="fa-solid fa-ghost text-4xl text-copper mb-3"></i>
+                        <p class="text-celadon font-cyber text-sm">Nenhum curso encontrado com esse termo.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredCourses.forEach(course => {
+                const card = document.createElement('article');
+                card.className = 'glass-card rounded-2xl p-6 flex flex-col justify-between border border-willow-green/20';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-ebony/80 border border-willow-green/40 flex items-center justify-center text-willow-green text-lg">
+                                <i class="${course.icon}"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded bg-copper/20 border border-copper text-copper font-pixel text-xs">
+                                ${course.hours} Horas
+                            </span>
+                        </div>
+                        <span class="text-[10px] font-cyber uppercase tracking-widest text-celadon/70 block mb-1">
+                            ${course.category.toUpperCase()}
+                        </span>
+                        <h3 class="font-cyber font-bold text-lg text-vanilla-custard mb-2">
+                            ${course.title}
+                        </h3>
+                        <p class="text-celadon text-xs line-clamp-3 mb-6 font-sans leading-relaxed">
+                            ${course.desc}
+                        </p>
+                    </div>
+
+                    <div class="pt-4 border-t border-willow-green/10 flex items-center justify-between gap-2">
+                        <button onclick="openCourseModal('${course.id}')" class="text-xs font-cyber text-willow-green hover:text-vanilla-custard transition-colors flex items-center gap-1">
+                            <i class="fa-solid fa-circle-info"></i> Detalhes
+                        </button>
+                        <button onclick="openEnrollModal('${course.title}')" class="px-3 py-1.5 rounded-lg bg-willow-green text-ebony font-cyber text-xs font-bold hover:bg-willow-green/90 transition-all">
+                            Matricular
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function setupFilters() {
+            const searchInput = document.getElementById('course-search');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            let currentCategory = 'todos';
+            let currentQuery = '';
+
+            function applyFilters() {
+                const filtered = COURSES_DATA.filter(course => {
+                    const matchesCat = currentCategory === 'todos' || course.category === currentCategory;
+                    const matchesQuery = course.title.toLowerCase().includes(currentQuery) || 
+                                         course.desc.toLowerCase().includes(currentQuery);
+                    return matchesCat && matchesQuery;
+                });
+                renderCourses(filtered);
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                currentQuery = e.target.value.toLowerCase();
+                applyFilters();
+            });
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-willow-green', 'text-ebony');
+                        b.classList.add('glass-card', 'text-celadon');
+                    });
+                    btn.classList.add('active', 'bg-willow-green', 'text-ebony');
+                    btn.classList.remove('glass-card', 'text-celadon');
+
+                    currentCategory = btn.getAttribute('data-category');
+                    applyFilters();
+                });
+            });
+        }
+
+        function setupSimulator() {
+            const simContainer = document.getElementById('sim-options');
+            simContainer.innerHTML = '';
+
+            COURSES_DATA.forEach(course => {
+                const item = document.createElement('label');
+                item.className = 'flex items-center justify-between p-3 rounded-lg glass-card cursor-pointer hover:border-willow-green/50 transition-colors';
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" value="${course.id}" data-hours="${course.hours}" class="sim-checkbox accent-willow-green w-4 h-4 rounded">
+                        <div>
+                            <span class="font-cyber text-xs text-vanilla-custard block">${course.title}</span>
+                            <span class="text-[10px] text-celadon/70 font-sans">${course.category.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <span class="font-pixel text-xs text-willow-green">${course.hours}h</span>
+                `;
+                simContainer.appendChild(item);
+            });
+
+            const checkboxes = document.querySelectorAll('.sim-checkbox');
+            checkboxes.forEach(cb => cb.addEventListener('change', updateSimSummary));
+        }
+
+        function updateSimSummary() {
+            const checkboxes = document.querySelectorAll('.sim-checkbox:checked');
+            let totalHours = 0;
+            let count = checkboxes.length;
+
+            checkboxes.forEach(cb => {
+                totalHours += parseInt(cb.getAttribute('data-hours'));
+            });
+
+            document.getElementById('sim-count').textContent = `${count} curso${count !== 1 ? 's' : ''}`;
+            document.getElementById('sim-hours').textContent = `${totalHours}h`;
+
+            // Calculate Level & Progress Bar
+            const maxHours = 380;
+            const percentage = Math.min(100, Math.round((totalHours / maxHours) * 100));
+            document.getElementById('sim-bar').style.width = `${percentage}%`;
+
+            let level = 'Iniciante Curioso';
+            if (totalHours >= 200) level = 'Mestre do Pagode Tech 👑';
+            else if (totalHours >= 120) level = 'Desenvolvedor Pleno 🚀';
+            else if (totalHours >= 60) level = 'Samba-Coder Aprendiz 🥁';
+
+            document.getElementById('sim-level').textContent = level;
+
+            const enrollBtn = document.getElementById('sim-enroll-btn');
+            enrollBtn.disabled = count === 0;
+        }
+
+        function enrollSelectedCourses() {
+            openEnrollModal('Trilha Personalizada Simulada');
+        }
+
+        function openCourseModal(courseId) {
+            const course = COURSES_DATA.find(c => c.id === courseId);
+            if (!course) return;
+
+            document.getElementById('modal-badge').textContent = course.category.toUpperCase();
+            document.getElementById('modal-title').textContent = course.title;
+            document.getElementById('modal-hours').innerHTML = `<i class="fa-regular fa-clock"></i> ${course.hours} Horas`;
+            document.getElementById('modal-level').innerHTML = `<i class="fa-solid fa-signal"></i> ${course.tag}`;
+            document.getElementById('modal-desc').textContent = course.desc;
+            document.getElementById('modal-target').textContent = course.target;
+            document.getElementById('modal-reqs').textContent = course.reqs;
+
+            const syllabusList = document.getElementById('modal-syllabus');
+            syllabusList.innerHTML = '';
+            course.syllabus.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                syllabusList.appendChild(li);
+            });
+
+            const enrollBtn = document.getElementById('modal-enroll-btn');
+            enrollBtn.onclick = () => {
+                closeCourseModal();
+                openEnrollModal(course.title);
+            };
+
+            document.getElementById('course-modal').classList.remove('hidden');
+        }
+
+        function closeCourseModal() {
+            document.getElementById('course-modal').classList.add('hidden');
+        }
+
+        function openEnrollModal(courseTitle) {
+            document.getElementById('enroll-course-name').textContent = `Curso Selecionado: ${courseTitle}`;
+            document.getElementById('enroll-form').classList.remove('hidden');
+            document.getElementById('enroll-success').classList.add('hidden');
+            document.getElementById('enroll-modal').classList.remove('hidden');
+        }
+
+        function closeEnrollModal() {
+            document.getElementById('enroll-modal').classList.add('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            playSynthBeep(660, 0.2); // Beep sound on submit
+            document.getElementById('enroll-form').classList.add('hidden');
+            document.getElementById('enroll-success').classList.remove('hidden');
+        }
+
+        function setupFAQ() {
+            const toggles = document.querySelectorAll('.faq-toggle');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const content = toggle.nextElementSibling;
+                    const icon = toggle.querySelector('i');
+                    const isOpen = !content.classList.contains('hidden');
+
+                    // Close all FAQs
+                    document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+                    document.querySelectorAll('.faq-toggle i').forEach(i => i.style.transform = 'rotate(0deg)');
+
+                    if (!isOpen) {
+                        content.classList.remove('hidden');
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        }
+
+        let audioCtx = null;
+        let soundEnabled = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSynthBeep(freq = 440, duration = 0.1) {
+            if (!soundEnabled) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
+        }
+
+        function setupAudioToggle() {
+            const btn = document.getElementById('audio-toggle');
+            const icon = document.getElementById('audio-icon');
+
+            btn.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                if (soundEnabled) {
+                    initAudio();
+                    icon.className = 'fa-solid fa-volume-high text-willow-green';
+                    playSynthBeep(880, 0.15);
+                } else {
+                    icon.className = 'fa-solid fa-volume-xmark text-vanilla-custard';
+                }
+            });
+        }
+
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            
+            // Fog for synthwave horizon effect
+            scene.fog = new THREE.FogExp2(0x0b0e0a, 0.025);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 3, 12);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // 1. Cyberpunk Infinite Grid Ground
+            const gridHelper = new THREE.GridHelper(100, 40, 0x8ed081, 0x4b543b);
+            gridHelper.position.y = -2;
+            scene.add(gridHelper);
+
+            // 2. Floating Golden/Green Particles
+            const particlesCount = 200;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 40;
+                positions[i + 1] = Math.random() * 20 - 2;
+                positions[i + 2] = (Math.random() - 0.5) * 40;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                color: 0xdce2aa,
+                size: 0.15,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+
+            // Mouse Interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            window.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
+            });
+
+            // Animation Loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Move grid towards camera for speed sensation
+                gridHelper.position.z += 0.05;
+                if (gridHelper.position.z > 2.5) {
+                    gridHelper.position.z = 0;
+                }
+
+                // Gently rotate particle system
+                particleSystem.rotation.y += 0.001;
+
+                // Subtle camera tilt following mouse
+                camera.position.x += (mouseX * 4 - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY * 2 + 3 - camera.position.y) * 0.05;
+                camera.lookAt(0, 0, 0);
+
+                renderer.render(scene, camera);
+            }
+
+            // Window Resize Handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+        }
+
+        window.onload = function() {
+            renderCourses();
+            setupFilters();
+            setupSimulator();
+            setupFAQ();
+            setupAudioToggle();
+            initThreeJS();
+
+            // Mobile menu toggle logic
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        };
+    </script>
+</body>
+</html>
